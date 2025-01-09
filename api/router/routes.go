@@ -22,7 +22,7 @@ func GetRoute(r *gin.Engine) {
 	taskRouter := r.Group("/api/tasks")
 	{
 		taskRouter.GET("/", controllers.GetTask)
-		taskRouter.POST("/create", controllers.CreateTask)
+		taskRouter.POST("/", controllers.CreateTask)
 		taskRouter.GET("/:id", controllers.ShowTask)
 		taskRouter.PUT("/:id", controllers.UpdateTask)
 		taskRouter.DELETE("/:id", controllers.DeleteTask)

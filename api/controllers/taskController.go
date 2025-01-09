@@ -92,7 +92,7 @@ func GetTask(c *gin.Context) {
 	pageStr := c.DefaultQuery("page", "1")
 	page, _ := strconv.Atoi(pageStr)
 
-	perPageStr := c.DefaultQuery("perPage", "5")
+	perPageStr := c.DefaultQuery("per_page", "5")
 	perPage, _ := strconv.Atoi(perPageStr)
 
 	// Fetch tasks with pagination
@@ -336,7 +336,7 @@ func PermanentlyDeleteTask(c *gin.Context) {
 		return
 	}
 
-	// Delete the task
+	// Delete task
 	initializers.DB.Unscoped().Delete(&task)
 
 	// Return response
