@@ -32,7 +32,7 @@ func CreateTask(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&taskInput); err != nil {
 		if errs, ok := err.(validator.ValidationErrors); ok {
-			helpers.LogAndReportError(errs, "validation input task") // Log validation error
+			go helpers.LogAndReportError(errs, "validation input task") // Log validation error
 
 			c.JSON(http.StatusUnprocessableEntity, gin.H{
 				"validations": validations.FormatValidationErrors(errs),
@@ -50,7 +50,7 @@ func CreateTask(c *gin.Context) {
 	// Parse DueDate
 	dueDate, err := time.Parse(time.RFC3339, taskInput.DueDate)
 	if err != nil {
-		helpers.LogAndReportError(err, "error parse duedate")
+		go helpers.LogAndReportError(err, "error parse duedate")
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid dueDate format. Use ISO 8601 format (e.g., 2025-01-09T15:04:05Z).",
 		})
@@ -98,7 +98,7 @@ func GetTask(c *gin.Context) {
 	// Fetch tasks with pagination
 	result, err := pagination.Paginate(initializers.DB, page, perPage, nil, &tasks)
 	if err != nil {
-		helpers.LogAndReportError(err, "error get paginate list")
+		go helpers.LogAndReportError(err, "error get paginate list")
 		format_errors.InternalServerError(c)
 		return
 	}
@@ -124,7 +124,7 @@ func GetTask(c *gin.Context) {
 
 	// Return the response
 	c.JSON(http.StatusOK, gin.H{
-		" code":      consts.OK,
+		"code":       consts.OK,
 		"tasks":      formattedTasks,
 		"pagination": paginationDetails,
 	})
@@ -174,7 +174,7 @@ func ShowTask(c *gin.Context) {
 
 	err = helpers.SetToCache(cacheKey, transformTask, time.Hour)
 	if err != nil {
-		helpers.LogAndReportError(err, "error setting cache")
+		go helpers.LogAndReportError(err, "error setting cache")
 	}
 
 	// Return the task
@@ -201,7 +201,7 @@ func UpdateTask(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&taskInput); err != nil {
 		if errs, ok := err.(validator.ValidationErrors); ok {
-			helpers.LogAndReportError(errs, "validation input task update") // Log validation error
+			go helpers.LogAndReportError(errs, "validation input task update") // Log validation error
 			c.JSON(http.StatusUnprocessableEntity, gin.H{
 				"validations": validations.FormatValidationErrors(errs),
 			})
@@ -243,7 +243,7 @@ func UpdateTask(c *gin.Context) {
 	err = helpers.DelCache(cacheKey)
 	if err == nil {
 		fmt.Println("Error delete cache")
-		helpers.LogAndReportError(err, "error delete cache") // Log validation error
+		go helpers.LogAndReportError(err, "error delete cache") // Log validation error
 	}
 
 	// Update the task
@@ -269,7 +269,7 @@ func UpdateTask(c *gin.Context) {
 
 	err = helpers.SetToCache(cacheKey, transformTask, time.Hour)
 	if err != nil {
-		helpers.LogAndReportError(err, "error setting cache")
+		go helpers.LogAndReportError(err, "error setting cache")
 	}
 
 	// Return the updated task
